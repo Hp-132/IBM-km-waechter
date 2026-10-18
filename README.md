@@ -1,6 +1,5 @@
 # KM-Wächter — Fleet Service-Interval Monitoring
-
-![CI](https://github.com/Hp-132/IBM-km-waechter/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/Hp-132/IBM-km-waechter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Hp-132/IBM-km-waechter/actions/workflows/ci.yml)
 ![acceptance](https://img.shields.io/badge/acceptance-11%2F11-brightgreen)
 ![python](https://img.shields.io/badge/python-3.11-blue)
 
