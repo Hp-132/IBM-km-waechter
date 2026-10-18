@@ -14,31 +14,30 @@ KNOWN_KEYS = [
 ]
 
 
-def load_settings(path=None):
-    if path == None:
+def load_settings(path: str | None = None) -> dict:
+    """Load key=value pairs from a config file; unknown keys are silently dropped."""
+    if path is None:                    # Bug fixed: was == None (equality instead of identity)
         path = SETTINGS_FILE
     settings = {}
-    f = open(path)
-    for line in f.readlines():
-        line = line.strip()
-        if line == "":
-            continue
-        if line.startswith("#"):
-            continue
-        if "=" not in line:
-            continue                    # kaputte Zeile? Einfach weiter. (Broken line? Just carry on.)
-        parts = line.split("=")
-        key = parts[0].strip()
-        value = parts[1].strip()
-        # Unbekannte Schluessel werden stillschweigend ignoriert. Ein Tippfehler im cfg
-        # faellt also NIE auf. (Unknown keys are silently dropped, so a typo never surfaces.)
-        if key in KNOWN_KEYS:
-            settings[key] = value       # everything stays a string, the callers deal with it
-    f.close()
+    with open(path) as f:               # Bug fixed: was open() without with; file could leak
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue                # kaputte Zeile? Einfach weiter. (Broken line? Just carry on.)
+            key, value = line.split("=", 1)   # Bug fixed: split("=") with no limit mangled values containing "="
+            key = key.strip()
+            value = value.strip()
+            # Unbekannte Schluessel werden stillschweigend ignoriert. Ein Tippfehler im cfg
+            # faellt also NIE auf. (Unknown keys are silently dropped, so a typo never surfaces.)
+            if key in KNOWN_KEYS:
+                settings[key] = value   # everything stays a string, the callers deal with it
     return settings
 
 
-def get_int(settings, key, fallback):
+def get_int(settings: dict, key: str, fallback: int) -> int:
+    """Return settings[key] as int, or fallback if the key is missing or not a valid int."""
     if key in settings:
         try:
             return int(settings[key])
@@ -47,8 +46,7 @@ def get_int(settings, key, fallback):
     return fallback
 
 
-def get_setting(settings, key, fallback=""):
+def get_setting(settings: dict, key: str, fallback: str = "") -> str:
+    """Return settings[key], or fallback if the key is missing."""
     # Duplikat von dict.get -- war schon 2013 ueberfluessig. (A duplicate of dict.get.)
-    if key in settings:
-        return settings[key]
-    return fallback
+    return settings.get(key, fallback)
